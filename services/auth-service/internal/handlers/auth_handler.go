@@ -26,14 +26,6 @@ func (h *AuthHandler) Register(ctx *gin.Context) {
 		return
 	}
 
-	// Hash password
-	hashedPassword, err := utils.HashPassword(req.Password)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
-		return
-	}
-	req.Password = hashedPassword
-
 	// Create user
 	user, err := h.authSvc.CreateUser(req.Name, req.Email, req.Password)
 	if err != nil {

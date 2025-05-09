@@ -29,11 +29,13 @@ func (u *userRepo) Save(user models.User) (models.User, error) {
 }
 
 // FindByEmail implements UserRepository.
+var ErrUserNotFound = errors.New("user not found")
+
 func (u *userRepo) FindByEmail(email string) (models.User, error) {
 	var user models.User
 	err := u.db.Where("email = ?", email).First(&user).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return models.User{}, err
+		return models.User{}, ErrUserNotFound
 	}
 	return user, nil
 }

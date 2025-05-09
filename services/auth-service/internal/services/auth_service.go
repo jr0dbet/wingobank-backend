@@ -22,9 +22,12 @@ func NewAuthService(userRepo repositories.UserRepository) AuthService {
 }
 
 // CreateUser implements AuthService.
-func (a *authService) CreateUser(name string, email string, password string) (models.User, error) {
-	if _, err := a.userRepo.FindByEmail(email); err != nil {
+func (s *authService) CreateUser(name string, email string, password string) (models.User, error) {
+	switch _, err := s.userRepo.FindByEmail(email); {
+	case err == nil:
 		return models.User{}, errors.New("email already registered")
+	case !errors.Is(err, repositories.ErrUserNotFound):
+		return models.User{}, err
 	}
 
 	// Hashes password
@@ -34,12 +37,11 @@ func (a *authService) CreateUser(name string, email string, password string) (mo
 	}
 
 	// Persists new user
-	user := models.User{
+	return s.userRepo.Save(models.User{
 		Name:     name,
 		Email:    email,
 		Password: hashed,
-	}
-	return a.userRepo.Save(user)
+	})
 }
 
 // Authenticate implements AuthService.

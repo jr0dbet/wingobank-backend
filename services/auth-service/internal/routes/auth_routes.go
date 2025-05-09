@@ -7,6 +7,9 @@ import (
 )
 
 func RegisterAuthRoutes(rg *gin.RouterGroup, h *handlers.AuthHandler) {
+	rg.GET("/ping", func(ctx *gin.Context) {
+		ctx.JSON(200, gin.H{"message": "pong"})
+	})
 	rg.POST("/register", h.Register)
 	rg.POST("/login", h.Login)
 
